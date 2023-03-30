@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- <bean> 저장소에 해당하는 XML 설정 파일을 참조하여 <bean>의 생명 주기를 관리하고 여러가지 서비스를 제공, 중요 -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:cache="http://www.springframework.org/schema/cache"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:lang="http://www.springframework.org/schema/lang"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+		http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-4.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+		http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-4.2.xsd
+		http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-4.2.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.2.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.2.xsd">
+
+
+	<!-- <import> 태그 : 스프링 기반의 애플리케이션은 단순한 <bean> 등록 외에도 트랜잭션 관리, 예외 처리, 다국어 
+		처리 등 복잡하고 다양한 설정이 필요 이런 모든 설정응ㄹ 하나의 파일로 모두 처리할 수도 있지만 그렇게 하면 스프링 설정 파일이 너무 
+		길어지고 관리도 어려움 결국 기능별 여러 XML 파일로 나누어 설정하는 것이 더 효율적인데, 이렇게 분리하여 작성한 설정파일들을 하나로 
+		통합할 때 <import> 엘리먼트 사용 <import> 태그를 이용하여 여러 스프링 설정 파일을 포함함으로써 한 파일에 작성하는 
+		것과 같은 효과를 낼수 있다. 예를 틀면 <import resource="context-datasource.xml> <import 
+		resource="context-transaction.xml> -->
+
+
+
+	<!-- id는 생략 가능, name도 있으나 id 사용을 선호, 클래스는 정확한 패키지 경로와 클래스 이름을 지정, 자동완성 기능 
+		활용 -->
+
+	<!-- init-method 속성 -->
+	<!-- 스프링 컨테이너는 <bean> 등록된 클래스 객체를 생성한 후에 init-method 속성으로 지정된 메서드를 호출함, 
+		이 메서드에서 멤버변수에 대한 초기화 작업을 처리함 -->
+	<!-- The name of the custom initialization method to invoke after setting 
+		bean properties. The method must have no arguments, but may throw any exception. 
+		This is an alternative to implementing Spring's InitializingBean interface 
+		or marking a method with the PostConstruct annotation. -->
+
+	<!-- destroy-method 속성 -->
+	<!-- 스프링 컨테이너가 객체를 삭제하기 직전에 호출될 임의의 메서드를 지정 -->
+	<!-- The name of the custom destroy method to invoke on bean factory shutdown. 
+		The method must have no arguments, but may throw any exception. This is an 
+		alternative to implementing Spring's DisposableBean interface or the standard 
+		Java Closeable/AutoCloseable interface, or marking a method with the PreDestroy 
+		annotation. Note: Only invoked on beans whose lifecycle is under the full 
+		control of the factory - which is always the case for singletons, but not 
+		guaranteed for any other scope. -->
+
+	<!-- lazy-init 속성 : true로 하면 미리 생성하지 않고 클라이언트가 요청하는 시점에 생성, 그러므로 메모리 관리 
+		효율적 Indicates whether this bean is to be lazily initialized. -->
+
+	<!-- scope 속성 : 기본이 싱글톤, 생략됨, 단하나만 생성되어 운용되도록 한다. prototype은 요청될 때마다 새로운 
+		객체 생성 The scope of this bean: typically "singleton" (one shared instance, 
+		which will be returned by all calls to getBean with the given id), or "prototype" 
+		(independent instance resulting from each call to getBean) -->
+	<!-- <bean id="tv" class="SamsungTV" init-method="initMethod" destroy-method="destroyMethod" 
+		scope="singleton"></bean> -->
+
+	<!--  <bean id="tv" class="polymorphism.SamsungTV" p:speaker-ref="sony" 
+		p:price="3000" scope="singleton"> -->
+
+	<!-- 생성자를 이용한 의존성 처리 -->
+	<!-- <constructor-arg ref="apple"></constructor-arg> <constructor-arg value="150"></constructor-arg> -->
+
+	<!-- setter 인젝션 의존성 처리 -->
+
+	<!-- <property name="speaker" ref="sony"></property> <property name="price" 
+		value="2000"></property> -->
+	<!-- </bean> -->
+
+
+	<!-- <bean id="sony" class="polymorphism.SonySpeaker"></bean> -->
+	<!-- <bean id="apple" class="polymorphism.AppleSpeaker"></bean> -->
+
+
+	<!-- <bean id="collectionBean" class="injection.CollectionBean">
+
+		<property name="addressList"> -->
+
+			<!-- <list> <value>모란역</value> <value>모란역</value> <value>강남역</value> <value>역삼역</value> 
+				</list> -->
+
+			<!--Map 컬렉션을 사용했을 때  -->
+			<!-- <map>
+				<entry>
+					<key>
+						<value>고길동</value>
+					</key>
+					<value>서울시 강남구 역삼동</value>
+				</entry>
+				<entry>
+					<key>
+						<value>마이콜</value>
+					</key>
+					<value>서울시 강서구 화곡동</value>
+				</entry>
+			</map> -->
+
+			<!-- Props elements differ from map elements in that values must be strings. --> 
+			
+			<!--Properties 컬렉션을 사용했을 때  -->
+	<!-- 		<props>
+			<prop key="고길동2">서울시 강남구 역삼동2</prop>
+			<prop key="마이콜2">서울시 강서구 화곡동2</prop>
+			</props>
+
+
+		</property> -->
+
+
+
+<!-- 	</bean> -->
+
+
+
+<!-- <bean> 등록하지 않고 자동으로 생성하기 위함, 이 설정을 추가하면 스프링 컨테이너는 클래스 패스에 있는 클래스들을 스캔하여 @Component가 설정된 클래스들을 자동으로 객체 생성  -->
+	<context:component-scan base-package="polymorphism" />
+
+
+
+
+
+
+
+
+
+
+</beans>
