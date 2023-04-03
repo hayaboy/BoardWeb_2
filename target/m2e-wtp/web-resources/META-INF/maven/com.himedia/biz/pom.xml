@@ -35,11 +35,29 @@
 		</dependency>
 
 		<!-- AspectJ -->
+		<!-- The AspectJ runtime is a small library necessary to run Java programs 
+			enhanced by AspectJ aspects during a previous compile-time or post-compile-time 
+			(binary weaving) build step. -->
 		<dependency>
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjrt</artifactId>
 			<version>${org.aspectj-version}</version>
 		</dependency>
+
+		<!-- weaving : 조인포인트(어드바이스가 적용될 위치)에 실행할 코드인 어드바이스를 끼워넣는 과정 -->
+		<!--The AspectJ weaver applies aspects to Java classes. It can be used 
+			as a Java agent in order to apply load-time weaving (LTW) during class-loading 
+			and also contains the AspectJ runtime classes. -->
+
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjweaver</artifactId>
+			<version>1.8.8</version>
+			<scope>runtime</scope>
+		</dependency>
+
+
+
 
 		<!-- Logging -->
 		<dependency>
@@ -118,7 +136,7 @@
 			<scope>test</scope>
 		</dependency>
 
-	<!-- H2 데이터베이스 -->
+		<!-- H2 데이터베이스 -->
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
@@ -127,7 +145,7 @@
 		</dependency>
 
 
-<!-- Apache Commons BeanUtils provides an easy-to-use but flexible wrapper 
+		<!-- Apache Commons BeanUtils provides an easy-to-use but flexible wrapper 
 			around reflection and introspection. -->
 		<dependency>
 			<groupId>commons-beanutils</groupId>

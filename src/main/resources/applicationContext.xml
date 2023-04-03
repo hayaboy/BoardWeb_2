@@ -64,8 +64,8 @@
 	<!-- <bean id="tv" class="SamsungTV" init-method="initMethod" destroy-method="destroyMethod" 
 		scope="singleton"></bean> -->
 
-	<!--  <bean id="tv" class="polymorphism.SamsungTV" p:speaker-ref="sony" 
-		p:price="3000" scope="singleton"> -->
+	<!-- <bean id="tv" class="polymorphism.SamsungTV" p:speaker-ref="sony" p:price="3000" 
+		scope="singleton"> -->
 
 	<!-- 생성자를 이용한 의존성 처리 -->
 	<!-- <constructor-arg ref="apple"></constructor-arg> <constructor-arg value="150"></constructor-arg> -->
@@ -81,70 +81,90 @@
 	<!-- <bean id="apple" class="polymorphism.AppleSpeaker"></bean> -->
 
 
-	<!-- <bean id="collectionBean" class="injection.CollectionBean">
+	<!-- <bean id="collectionBean" class="injection.CollectionBean"> <property 
+		name="addressList"> -->
 
-		<property name="addressList"> -->
+	<!-- <list> <value>모란역</value> <value>모란역</value> <value>강남역</value> <value>역삼역</value> 
+		</list> -->
 
-			<!-- <list> <value>모란역</value> <value>모란역</value> <value>강남역</value> <value>역삼역</value> 
-				</list> -->
+	<!--Map 컬렉션을 사용했을 때 -->
+	<!-- <map> <entry> <key> <value>고길동</value> </key> <value>서울시 강남구 역삼동</value> 
+		</entry> <entry> <key> <value>마이콜</value> </key> <value>서울시 강서구 화곡동</value> 
+		</entry> </map> -->
 
-			<!--Map 컬렉션을 사용했을 때  -->
-			<!-- <map>
-				<entry>
-					<key>
-						<value>고길동</value>
-					</key>
-					<value>서울시 강남구 역삼동</value>
-				</entry>
-				<entry>
-					<key>
-						<value>마이콜</value>
-					</key>
-					<value>서울시 강서구 화곡동</value>
-				</entry>
-			</map> -->
+	<!-- Props elements differ from map elements in that values must be strings. -->
 
-			<!-- Props elements differ from map elements in that values must be strings. --> 
+	<!--Properties 컬렉션을 사용했을 때 -->
+	<!-- <props> <prop key="고길동2">서울시 강남구 역삼동2</prop> <prop key="마이콜2">서울시 강서구 
+		화곡동2</prop> </props> </property> -->
+
+
+
+	<!-- </bean> -->
+
+
+
+	<!-- <bean> 등록하지 않고 자동으로 생성하기 위함, 이 설정을 추가하면 스프링 컨테이너는 클래스 패스에 있는 클래스들을 
+		스캔하여 @Component가 설정된 클래스들을 자동으로 객체 생성 -->
+
+
+
+
+	<bean id="dataSource"
+		class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="org.h2.Driver"></property>
+		<property name="url" value="jdbc:h2:tcp://localhost/~/test"></property>
+		<property name="username" value="sa"></property>
+		<property name="password" value=""></property>
+	</bean>
+
+	<context:component-scan
+		base-package="com.springbook.biz" />
+
+	<!--AOP 관련 어노테이션들을 인식하고 용도에 맞게 처리해 줌  -->
+	<aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+
+    
+
+
+	<!-- <bean id="userService" class="com.springbook.biz.user.impl.UserServiceImpl"> 
+		<property name="userDAO" ref="userDAO" /> </bean> <bean id="userDAO" class="com.springbook.biz.user.impl.UserDAO" 
+		/> -->
+
+
+
+	<bean id="around" class="com.springbook.biz.common.AroundAdvice"></bean>
+
+	<!-- <aop:config> -->
+		<!-- 어드바이스를 적용할 위치 선정하는 설정, 어드바이스(보조기능)는 포인트 컷으로 적용될 위치가 결정되고, 그 시점에 어드바이스가 
+			실행된다. 포인트 컷은 포인트 컷 표현식을 사용하여 설정할 수 있으며, 특정 어노테이션을 지정하여 설정할 수도 있다. -->
+			<!--   *      com.springbook.biz..*Impl.*(..)) -->
+			<!--   리턴타입  패키지 경로          ..클래스명.메소드명 및 매개변수 -->
 			
-			<!--Properties 컬렉션을 사용했을 때  -->
-	<!-- 		<props>
-			<prop key="고길동2">서울시 강남구 역삼동2</prop>
-			<prop key="마이콜2">서울시 강서구 화곡동2</prop>
-			</props>
+		<!-- <aop:pointcut
+			expression="execution(* com.springbook.biz..*Impl.*(..))"
+			id="allPointCut" />
+			
+		<aop:pointcut
+			expression="execution(* com.springbook.biz..*Impl.get*(..))"
+			id="getPointCut" />
 
-
-		</property> -->
-
-
-
-<!-- 	</bean> -->
-
-
-
-<!-- <bean> 등록하지 않고 자동으로 생성하기 위함, 이 설정을 추가하면 스프링 컨테이너는 클래스 패스에 있는 클래스들을 스캔하여 @Component가 설정된 클래스들을 자동으로 객체 생성  -->
-
-
-
-
-	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-			<property name="driverClassName" value="org.h2.Driver"></property>
-			<property name="url" value="jdbc:h2:tcp://localhost/~/test"></property>
-			<property name="username" value="sa"></property>
-			<property name="password" value=""></property>
-	</bean>
-
-	<context:component-scan base-package="com.springbook.biz" />
-
-
-	<!-- <bean id="userService" class="com.springbook.biz.user.impl.UserServiceImpl">
-		<property name="userDAO" ref="userDAO" />
-	</bean>
-	<bean id="userDAO" class="com.springbook.biz.user.impl.UserDAO" />
- -->
-
-
-
-
-
+		<aop:aspect ref="around" >
+			<aop:around pointcut-ref="allPointCut"
+				method="aroundLog" />
+		</aop:aspect> -->
+		
+		
+		
+		<!-- aop:advisor
+		엘리먼트는 포인트것과 어드바이스를 결합한다는 점에서는 애스펙트와 같은 기능을 한다.
+		하지만 트랜잭션 설정 같은 몇몇 특수한 경우는 애스펙트가 아닌 어드바이저를 사용해야 한다. 왜냐하면 어드바이스 객체의
+		메소드 이름을 확인할 수 없을 때
+		 -->
+		
+		
+		
+		
+	<!-- </aop:config> -->
 
 </beans>
