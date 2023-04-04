@@ -161,6 +161,15 @@
 			<artifactId>commons-dbcp</artifactId>
 			<version>1.2.2</version>
 		</dependency>
+		
+		
+		
+		<!-- Spring JDBC provides an abstraction layer that simplifies code to use JDBC and the parsing of database-vendor specific error codes. -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>${org.springframework-version}</version>
+		</dependency>
 
 	</dependencies>
 	<build>

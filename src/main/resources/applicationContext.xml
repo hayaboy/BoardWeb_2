@@ -13,14 +13,16 @@
 	xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:task="http://www.springframework.org/schema/task"
 	xmlns:util="http://www.springframework.org/schema/util"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
-		http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-4.2.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-4.2.xsd
 		http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-4.2.xsd
-		http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-4.2.xsd
 		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
 		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+		http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-4.2.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.2.xsd">
 
 
@@ -109,22 +111,72 @@
 
 
 
+	<!-- DataSource 설정 : 스프링 JDBC만을 위한 설정은 아니고 후에 테스트할 트랜잭션 처리나 MyBatis 연동, 
+		JPA 연동에서도 중요, 일반적으로 Apache의 BasicDataSource 사용 -->
+
+<!--AOP 관련 어노테이션들을 인식하고 용도에 맞게 처리해 줌 -->
+	<aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+
+
+	<context:property-placeholder
+		location="classpath:config/database.properties" />
 
 	<bean id="dataSource"
 		class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-		<property name="driverClassName" value="org.h2.Driver"></property>
-		<property name="url" value="jdbc:h2:tcp://localhost/~/test"></property>
-		<property name="username" value="sa"></property>
-		<property name="password" value=""></property>
+		<property name="driverClassName" value="${jdbc.driver}"></property>
+		<property name="url" value="${jdbc.url}"></property>
+		<property name="username" value="${jdbc.username}"></property>
+		<property name="password" value="${jbdc.password}"></property>
 	</bean>
+
+	<!-- SPRING JDBC 설정 -->
+	<!--This is the central class in the JDBC core package. It simplifies the 
+		use of JDBC and helps to avoid common errors. It executes core JDBC workflow, 
+		leaving application code to provide SQL and extract results. This class executes 
+		SQL queries or updates, initiating iteration over ResultSets and catching 
+		JDBC exceptions and translating them to the generic, more informative exception 
+		hierarchy defined in the org.springframework.dao package. -->
+	<bean class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+
+
+	<!-- Transaction 설정 -->
+	<!-- 모든 트랜잭션 관리자는 PlatformTransactionManager 인터페이스를 구현한 클래스이다. DataSourceTransactionManager도 
+		다른 트랜잭션 관리자와 마찬가지로 PlatformTransactionManager의 commit, rollback 메소드를 재정의하여 
+		구현하고 있을 뿐이지, PlatformTransactionManager 객체 스스로 자신이 가진 메소드를 실행할 수는 없다. 그렇다면 
+		트랜잭션 관리자가 가지고 있는 메소드를 호출하면서 실질적인 트랜잭션 관리 기능을 제공하는 것은 무었일까? 이 시점에서 어드바이스의 
+		개념을 다시 한 번 떠올려 보기 바란다. 어드바이스느 ㄴ비지니스 메소드 실행 전이나 후에 동작하여 비지니스 메소드와 무관하게 공통기능을 
+		제공한다. 이 공통 기능 중에서 가장 대표적인 것이 예외 처리와 트랜잭션 처리다. 비지니스 메소드가 실행되다가 예외가 발생하면 해당 
+		메소드에 대한 트랜잭션을 롤백하고 문제없이 정상으로 수행 종료되면 트랜잭션을 커밋하면 된다. 트랜잭션을 커밋 롤백하기 위핸 객체는 
+		DataTransactionManager로 등록했다. 이 트랜잭션 관리자를 이용하여 트랜잭셔능ㄹ 제어하는 어드바이스를 등록하면 됨 -->
+	<bean id="txManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+
+
+	<!-- get으로 시작하는 모든 메소드는 읽기 전용으로 처리되어 트랜잭션 관리대상에서 제외하고 나머지 메소드들은 트랜잭션 관리에 
+		포함 -->
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<tx:method name="get*" read-only="true" />
+			<tx:method name="*" />
+		</tx:attributes>
+	</tx:advice>
+
+
+
+	<aop:config>
+		<aop:pointcut id="txPointcut"  expression="execution(* com.springbook.biz..*(..))"/>		
+		<aop:advisor pointcut-ref="txPointcut" advice-ref="txAdvice"/>
+	</aop:config>
 
 	<context:component-scan
 		base-package="com.springbook.biz" />
 
-	<!--AOP 관련 어노테이션들을 인식하고 용도에 맞게 처리해 줌  -->
-	<aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+	
 
-    
 
 
 	<!-- <bean id="userService" class="com.springbook.biz.user.impl.UserServiceImpl"> 
@@ -133,38 +185,30 @@
 
 
 
-	<bean id="around" class="com.springbook.biz.common.AroundAdvice"></bean>
+	<!-- <bean id="log" class="com.springbook.biz.common.LogAdvide"></bean> -->
 
 	<!-- <aop:config> -->
+		
 		<!-- 어드바이스를 적용할 위치 선정하는 설정, 어드바이스(보조기능)는 포인트 컷으로 적용될 위치가 결정되고, 그 시점에 어드바이스가 
 			실행된다. 포인트 컷은 포인트 컷 표현식을 사용하여 설정할 수 있으며, 특정 어노테이션을 지정하여 설정할 수도 있다. -->
-			<!--   *      com.springbook.biz..*Impl.*(..)) -->
-			<!--   리턴타입  패키지 경로          ..클래스명.메소드명 및 매개변수 -->
-			
-		<!-- <aop:pointcut
-			expression="execution(* com.springbook.biz..*Impl.*(..))"
-			id="allPointCut" />
-			
-		<aop:pointcut
-			expression="execution(* com.springbook.biz..*Impl.get*(..))"
-			id="getPointCut" />
+		<!-- * com.springbook.biz..*Impl.*(..)) -->
+		<!-- 리턴타입 패키지 경로 ..클래스명.메소드명 및 매개변수 -->
 
-		<aop:aspect ref="around" >
-			<aop:around pointcut-ref="allPointCut"
-				method="aroundLog" />
-		</aop:aspect> -->
-		
-		
-		
-		<!-- aop:advisor
-		엘리먼트는 포인트것과 어드바이스를 결합한다는 점에서는 애스펙트와 같은 기능을 한다.
-		하지만 트랜잭션 설정 같은 몇몇 특수한 경우는 애스펙트가 아닌 어드바이저를 사용해야 한다. 왜냐하면 어드바이스 객체의
-		메소드 이름을 확인할 수 없을 때
-		 -->
-		
-		
-		
-		
-	<!-- </aop:config> -->
+		<!-- <aop:pointcut expression="execution(* com.springbook.biz..*Impl.*(..))" id="allPointCut" />
+		<aop:pointcut expression="execution(* com.springbook.biz..*Impl.get*(..))" id="getPointCut" />
+		<aop:aspect ref="log">
+			<aop:around pointcut-ref="allPointCut" method="printLog" />
+		</aop:aspect>  -->
+
+
+
+		<!-- aop:advisor 엘리먼트는 포인트것과 어드바이스를 결합한다는 점에서는 애스펙트와 같은 기능을 한다. 하지만 트랜잭션 
+			설정 같은 몇몇 특수한 경우는 애스펙트가 아닌 어드바이저를 사용해야 한다. 왜냐하면 어드바이스 객체의 메소드 이름을 확인할 수 없을 
+			때 -->
+
+
+
+
+		<!-- </aop:config> -->
 
 </beans>

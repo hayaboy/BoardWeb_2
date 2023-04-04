@@ -9,6 +9,9 @@ public class BoardServiceClient {
 
 	public static void main(String[] args) {
 		
+		
+		
+		
 		//1. 스프링 컨테이너 구동
 		AbstractApplicationContext	container=new GenericXmlApplicationContext("applicationContext.xml");
 		
@@ -17,7 +20,7 @@ public class BoardServiceClient {
 		BoardService boardService=	(BoardService) container.getBean("boardService");
 		
 		//3. 글 등록 기능 테스트
-		BoardVO vo=new BoardVO();
+		BoardVO vo=new BoardVO();		
 		vo.setTitle("임시 제목");
 		vo.setWriter("홍길동");
 		vo.setContent("임시 내용...");
