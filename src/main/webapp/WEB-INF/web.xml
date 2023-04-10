@@ -1,39 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee https://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
-  <context-param>
-    <param-name>contextConfigLocation</param-name>
-    <param-value>/WEB-INF/spring/root-context.xml</param-value>
-  </context-param>
-  
-  <listener>
-    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-  </listener>
-  
-  <servlet>
-    <servlet-name>appServlet</servlet-name>
-    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-    <init-param>
-      <param-name>contextConfigLocation</param-name>
-      <param-value>/WEB-INF/spring/appServlet/servlet-context.xml</param-value>
-    </init-param>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee https://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	version="2.5">
+	
+	<!--
+	Spring MVC를 적용하여 글 등록이나 수정 기능시 한글 처리	
+	 -->
+	<filter>
+		<filter-name>characterEncoding</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>EUC-KR</param-value>
+		</init-param>
+	</filter>
 
-  <servlet-mapping>
-    <servlet-name>appServlet</servlet-name>
-    <url-pattern>/</url-pattern>
-  </servlet-mapping>
+	<filter-mapping>
+		<filter-name>characterEncoding</filter-name>
+		<url-pattern>*.do</url-pattern>
+	</filter-mapping>
+	
+	
+	
+	<!-- <context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>/WEB-INF/spring/root-context.xml</param-value>
+	</context-param>
 
-  <servlet>
-    <description></description>
-    <display-name>action</display-name>
-    <servlet-name>action</servlet-name>
-    <servlet-class>com.springbook.view.controller.DispatcherServlet</servlet-class>
-  </servlet>
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener
+		</listener-class>
+	</listener> -->
 
-  <servlet-mapping>
-    <servlet-name>action</servlet-name>
-    <url-pattern>*.do</url-pattern>
-  </servlet-mapping>
+	<!-- <servlet>
+		<servlet-name>appServlet</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet
+		</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>/WEB-INF/spring/appServlet/servlet-context.xml
+			</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>appServlet</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping> -->
+
+	<!-- <servlet> <description></description> <display-name>action</display-name> 
+		<servlet-name>action</servlet-name> <servlet-class>com.springbook.view.controller.DispatcherServlet</servlet-class> 
+		</servlet> -->
+
+	<!-- Central dispatcher for HTTP request handlers/controllers, e.g. for 
+		web UI controllers or HTTP-based remote service exporters. Dispatches to 
+		registered handlers for processing a web request, providing convenient mapping 
+		and exception handling facilities. -->
+	<!-- 스프링 MVC 구성 요소 중 DispatcherServlet 클래스가 유일한 서블릿이다. 따라서 서블릿 컨테이너는 web.xml 
+		파일에 등록된 DispatcherServlet만 생성해준다. 하지만 DispatcherServlet 객체 혼자서는 클라이언트의 요청을 
+		처리할 수 없고 반드시 HandlerMapping, Controller, ViewResolver 객체들과 상호 작용해야 함 이 객체들을 
+		메모리에 생성하기 위해서 DispatcherServlet은 스프링 컨테이너를 구동하는 것이다. 스프링에서 제공하는 DispatcherServlet은 
+		스프링 컨테이너를 통해 이 객체들을 생성 -->		
+	<servlet>
+		<servlet-name>action</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet
+		</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>/WEB-INF/config/presentation-layer.xml</param-value>
+		</init-param>
+
+	</servlet>
+
+
+	<servlet-mapping>
+		<servlet-name>action</servlet-name>
+		<url-pattern>*.do</url-pattern>
+	</servlet-mapping>
 
 </web-app>
