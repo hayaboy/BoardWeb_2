@@ -1,6 +1,9 @@
 package com.springbook.view.user;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -18,7 +21,9 @@ import com.springbook.biz.user.impl.UserDAO;
 public class LoginController {
 
 	@RequestMapping(value = "/login.do", method = RequestMethod.GET)
-	public String loginView(UserVO vo) {
+	public String loginView(@ModelAttribute("user") UserVO vo) {  //스프링 컨테이너가 생성하는 객체의 이름은 클래스 이름(UserVO)의 첫글자를 소문자로 변경한 이름이 자동으로 설정된다. 
+																 // 따라서 UserVO 객체의 변수에 접근할 때 ${userVO.변수명}을 사용한 것이다.
+		                                                         // 그런데 객체의 이름을 변경하려면 @ModelAttribute를 사용해야 한다. 여기서는 user로 변경함 
 		System.out.println("로그인 화면으로 이동...");
 		vo.setId("test");
 		vo.setPassword("test123");
@@ -26,12 +31,21 @@ public class LoginController {
 	}
 
 	@RequestMapping(value = "/login.do", method = RequestMethod.POST)
-	public String login(UserVO vo, UserDAO userDAO) {
+	public String login(UserVO vo, UserDAO userDAO, HttpSession session) {
 		System.out.println("로그인 인증 처리...");
-		if (userDAO.getUser(vo) != null)
+		UserVO user=userDAO.getUser(vo);
+		if(user !=null) {
+			session.setAttribute("userName", user.getName());
 			return "getBoardList.do";
-		else
+		}else {
 			return "login.jsp";
+		}
+		
+		
+//		if (userDAO.getUser(vo) != null)
+//			return "getBoardList.do";
+//		else
+//			return "login.jsp";
 	}
 
 //	@RequestMapping(value = "/login.do")

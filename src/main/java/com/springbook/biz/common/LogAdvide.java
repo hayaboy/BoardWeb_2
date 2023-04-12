@@ -6,8 +6,8 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Service;
 
-//@Service
-//@Aspect  // AOP 설정에서 가장 중요, 애스펙트는 포인트컷과 어드바이스의 결합, 따라서 @Aspect가 설정된 애스펙트 객체에는 반드시 포인트 컷과 어드바이스를 결합하는 설정이 있어야 함
+@Service
+@Aspect  // AOP 설정에서 가장 중요, 애스펙트는 포인트컷과 어드바이스의 결합, 따라서 @Aspect가 설정된 애스펙트 객체에는 반드시 포인트 컷과 어드바이스를 결합하는 설정이 있어야 함
 public class LogAdvide {
 
 //		@Pointcut("execution(* com.springbook.biz..*Impl.*(..))")  // 포인트 컷
