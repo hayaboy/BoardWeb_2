@@ -1,16 +1,23 @@
 package com.springbook.view.board;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.springbook.biz.board.BoardListVO;
 import com.springbook.biz.board.BoardService;
 import com.springbook.biz.board.BoardVO;
 import com.springbook.biz.board.impl.BoardDAO;
@@ -37,8 +44,17 @@ public class BoardController {
 	}
 		
 	// 글 등록
-		@RequestMapping(value = "/insertBoard.do")
-		public String insertBoard(BoardVO vo, BoardDAO boardDAO) {
+		@RequestMapping(value = "/insertBoard.do")  // 스프링 컨테이너가 BoardVO 객체 생성시 MultipartFile 객체를 생성하고 할당함, 그런데 multipartResolver라는 이름으로 등록된 CommonsMultipartResolver 객체가 없으면 스프링 컨테이너는 MultipartFile 객체를 생성할 수 없다. 
+		public String insertBoard(BoardVO vo, BoardDAO boardDAO) throws IOException {
+			
+			// 파일 업로드 처리
+			MultipartFile uploadFile = vo.getUploadFile();
+			
+			if(!uploadFile.isEmpty()) {
+				String fileName = uploadFile.getOriginalFilename();
+				uploadFile.transferTo(new File("D:\\boardWebFile" + fileName));
+			}
+			
 			boardDAO.insertBoard(vo);
 			return "getBoardList.do";
 		}
@@ -74,9 +90,9 @@ public class BoardController {
 			return "getBoard.jsp"; //View 이름 리턴
 		}
 
-		// 글 목록 검색
-		@RequestMapping("/getBoardList.do")   
-		public String getBoardList(@RequestParam(value = "searchCondition",  defaultValue = "TITLE", required = false) String condition, @RequestParam(value = "searchKeyword", defaultValue = "", required = false) String keyword, BoardVO vo, BoardDAO boardDAO, Model model) {
+		// 글 목록 검색1
+//		@RequestMapping("/getBoardList.do")   
+//		public String getBoardList(@RequestParam(value = "searchCondition",  defaultValue = "TITLE", required = false) String condition, @RequestParam(value = "searchKeyword", defaultValue = "", required = false) String keyword, BoardVO vo, BoardDAO boardDAO, Model model) {
 			//@RequestParam :  Annotation which indicates that a method parameter should be bound to a web request parameter
 			// Spring MVC에서는 HTTP 요청 파라미터 정보를 추출하기 위한 @RequestParam를 제공함
 			// @RequestParam을 사용하면 검색과 관련된 파라미터 정보를 추출할 수 있다.
@@ -87,11 +103,76 @@ public class BoardController {
 		      required 속성을 false로 설정하면 메서드 호출 시 지정한 이름의 매개변수가 전달되면 값을 저장하고 없으면 null을 할당함
 			 * 
 			 *  */
-			System.out.println("검색 조건 : " + condition);
-			System.out.println("검색 단어 : " + keyword);
-			model.addAttribute("boardList", boardService.getBoardList(vo));
+//			System.out.println("검색 조건 : " + condition);
+//			System.out.println("검색 단어 : " + keyword);
+//			model.addAttribute("boardList", boardService.getBoardList(vo));
 //			mav.addObject("boardList", boardDAO.getBoardList(vo)); // Model 정보 저장
 //			mav.setViewName("getBoardList.jsp"); // View 정보 저장
-			return "getBoardList.jsp";  //View 이름 리턴
+//			return "getBoardList.jsp";  //View 이름 리턴
+//		}
+		
+		
+		
+		// 글 목록 검색2
+		@RequestMapping("/getBoardList.do")   
+		public String getBoardList(BoardVO vo, Model model) {
+			//Null Check, 검색 조건과 검색 키워드가 전달되지 않을 때를 위하여(예를 들면 로그인 성공 후 "getBoardList.do" 요청이 전달되거나 상세화면에서 글 목록 링크를 클릭하여 "getBoardList.do" 요청을 서버에 전달하면 검색 조건과 검색 키워드 정보는 전달되지 않는다. 이 때
+			// BoardVO 객체의 sarchCondition과 searchKeyword 변수에는 null이 설정됨, 따라서 이럴 때는 기본값을 설정하여 비지니스컴포넌트에 전달해야 하므로 널 체크함
+			System.out.println(vo.getSearchCondition());
+			if(vo.getSearchCondition() == null) {
+				vo.setSearchCondition("TITLE");
+			}
+			if(vo.getSearchKeyword() == null) {
+				vo.setSearchKeyword("");
+			}
+			
+			// Model 정보 저장
+			
+			model.addAttribute("boardList", boardService.getBoardList(vo));	
+			return "getBoardList.jsp"; // View 이름 리턴
 		}
+		
+		
+		
+		
+		
+		@RequestMapping("/dataTransform.do")
+		@ResponseBody  //자바 객체를 Http응답 프로토콜의 몸체로 변환하기 위해 사용
+		public BoardListVO dataTransform(BoardVO vo ) {
+			
+			
+			
+			vo.setSearchCondition("TITLE");
+			vo.setSearchKeyword("");
+			List<BoardVO> boardList = boardService.getBoardList(vo);
+			
+			BoardListVO boardListVO = new BoardListVO();
+			boardListVO.setBoardList(boardList);
+			
+			
+			
+			
+			return boardListVO;
+		}
+		
+
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 }

@@ -25,17 +25,23 @@ public class LoginController {
 																 // 따라서 UserVO 객체의 변수에 접근할 때 ${userVO.변수명}을 사용한 것이다.
 		                                                         // 그런데 객체의 이름을 변경하려면 @ModelAttribute를 사용해야 한다. 여기서는 user로 변경함 
 		System.out.println("로그인 화면으로 이동...");
-		vo.setId("test");
-		vo.setPassword("test123");
+//		vo.setId("test");
+//		vo.setPassword("test123");
 		return "login.jsp";
 	}
 
 	@RequestMapping(value = "/login.do", method = RequestMethod.POST)
 	public String login(UserVO vo, UserDAO userDAO, HttpSession session) {
 		System.out.println("로그인 인증 처리...");
+		
+		if (vo.getId() == null || vo.getId().equals("")) {
+			throw new IllegalArgumentException("아이디는 반드시 입력해야 합니다.");
+		}
+		
 		UserVO user=userDAO.getUser(vo);
 		if(user !=null) {
 			session.setAttribute("userName", user.getName());
+			System.out.println(user.getName());
 			return "getBoardList.do";
 		}else {
 			return "login.jsp";
